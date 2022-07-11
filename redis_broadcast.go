@@ -84,13 +84,39 @@ func newRedisBroadcast(nsp string, opts *RedisAdapterOptions) (*redisBroadcast, 
 	if len(opts.Password) > 0 {
 		redisOpts = append(redisOpts, redis.DialPassword(opts.Password))
 	}
-
-	pub, err := redis.Dial(opts.Network, addr, redisOpts...)
+	pul := redis.Pool{
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial(opts.Network, addr, redisOpts...)
+		},
+		DialContext:     nil,
+		TestOnBorrow:    nil,
+		MaxIdle:         0,
+		MaxActive:       0,
+		IdleTimeout:     0,
+		Wait:            true,
+		MaxConnLifetime: 0,
+	}
+	pub := pul.Get() //redis.Dial(opts.Network, addr, redisOpts...)
+	err := pub.Err()
 	if err != nil {
 		return nil, err
 	}
 
-	sub, err := redis.Dial(opts.Network, addr, redisOpts...)
+	subPool := redis.Pool{
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial(opts.Network, addr, redisOpts...)
+		},
+		DialContext:     nil,
+		TestOnBorrow:    nil,
+		MaxIdle:         0,
+		MaxActive:       0,
+		IdleTimeout:     0,
+		Wait:            true,
+		MaxConnLifetime: 0,
+	}
+	//sub, err := redis.Dial(opts.Network, addr, redisOpts...)
+	sub := subPool.Get()
+	err = pub.Err()
 	if err != nil {
 		return nil, err
 	}
