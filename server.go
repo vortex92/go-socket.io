@@ -50,6 +50,11 @@ func (s *Server) Close() error {
 	return s.engine.Close()
 }
 
+// Remove session from server.
+func (s *Server) RemoveSession(sid string) error {
+	return s.engine.Remove(sid)
+}
+
 // ServeHTTP dispatches the request to the handler whose pattern most closely matches the request URL.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.engine.ServeHTTP(w, r)
