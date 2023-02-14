@@ -240,7 +240,7 @@ func (bc *redisBroadcast) Send(room, event string, args ...interface{}) {
 	connections, ok := bc.rooms[room]
 	if ok {
 		for _, connection := range connections {
-			connection.Emit(event, args...)
+			go connection.Emit(event, args...)
 		}
 	}
 
@@ -254,7 +254,7 @@ func (bc *redisBroadcast) SendAll(event string, args ...interface{}) {
 
 	for _, connections := range bc.rooms {
 		for _, connection := range connections {
-			connection.Emit(event, args...)
+			go connection.Emit(event, args...)
 		}
 	}
 	bc.publishMessage("", event, args...)
@@ -503,7 +503,7 @@ func (bc *redisBroadcast) send(room string, event string, args ...interface{}) {
 	}
 
 	for _, connection := range connections {
-		connection.Emit(event, args...)
+		go connection.Emit(event, args...)
 	}
 }
 
@@ -533,7 +533,7 @@ func (bc *redisBroadcast) sendAll(event string, args ...interface{}) {
 
 	for _, connections := range bc.rooms {
 		for _, connection := range connections {
-			connection.Emit(event, args...)
+			go connection.Emit(event, args...)
 		}
 	}
 }
